@@ -3,7 +3,7 @@ import WhiteboardItem from "./WhiteboardItem";
 import WhiteboardToolbar from "./WhiteboardToolbar";
 import { useWhiteboard } from "../../context/WhiteboardContext";
 import { WhiteboardItem as WhiteboardItemType } from "../../types";
-import { FiTrash2 } from "react-icons/fi";
+import { FiTrash2, FiZoomIn, FiZoomOut, FiMaximize } from "react-icons/fi";
 
 const DEFAULT_CONTENT: Record<WhiteboardItemType["type"], string> = {
   sticky: "Add your notes here...",
@@ -50,12 +50,17 @@ const MAX_DIMENSIONS: Record<
   table: { width: 800, height: 600 },
 };
 
+const MIN_ZOOM = 0.5;
+const MAX_ZOOM = 2;
+const ZOOM_STEP = 0.1;
+
 const Whiteboard: React.FC = () => {
   const { whiteboardItems, addItem, deleteAllItems } = useWhiteboard();
   const whiteboardRef = useRef<HTMLDivElement>(null);
   const [selectedItemType, setSelectedItemType] = useState<
     WhiteboardItemType["type"] | null
   >(null);
+  const [zoom, setZoom] = useState(1);
 
   const handleAddItem = (type: WhiteboardItemType["type"]) => {
     setSelectedItemType(type);
@@ -69,16 +74,12 @@ const Whiteboard: React.FC = () => {
     const scrollLeft = whiteboardRef.current.scrollLeft;
     const scrollTop = whiteboardRef.current.scrollTop;
 
-    // Calculate the exact position where the user clicked
+    // Calculate the exact position where the user clicked, accounting for zoom
     const x =
-      e.clientX -
-      rect.left +
-      scrollLeft -
+      (e.clientX - rect.left + scrollLeft) / zoom -
       DEFAULT_DIMENSIONS[selectedItemType].width / 2;
     const y =
-      e.clientY -
-      rect.top +
-      scrollTop -
+      (e.clientY - rect.top + scrollTop) / zoom -
       DEFAULT_DIMENSIONS[selectedItemType].height / 2;
 
     // For arrow type, add start and end points
@@ -125,13 +126,13 @@ const Whiteboard: React.FC = () => {
             const whiteboardEl = whiteboardRef.current;
             if (!whiteboardEl) return;
 
-            // Calculate position based on center of viewport
+            // Calculate position based on center of viewport, accounting for zoom
             const rect = whiteboardEl.getBoundingClientRect();
             const scrollLeft = whiteboardEl.scrollLeft;
             const scrollTop = whiteboardEl.scrollTop;
 
-            const x = rect.width / 2 + scrollLeft - 150;
-            const y = rect.height / 2 + scrollTop - 100;
+            const x = (rect.width / 2 + scrollLeft) / zoom - 150;
+            const y = (rect.height / 2 + scrollTop) / zoom - 100;
 
             addItem({
               type: "image",
@@ -169,6 +170,18 @@ const Whiteboard: React.FC = () => {
     }
   };
 
+  const handleZoomIn = () => {
+    setZoom((prevZoom) => Math.min(prevZoom + ZOOM_STEP, MAX_ZOOM));
+  };
+
+  const handleZoomOut = () => {
+    setZoom((prevZoom) => Math.max(prevZoom - ZOOM_STEP, MIN_ZOOM));
+  };
+
+  const handleResetZoom = () => {
+    setZoom(1);
+  };
+
   return (
     <div
       className={`flex-1 relative bg-gray-50 overflow-auto whiteboard-container ${
@@ -179,7 +192,14 @@ const Whiteboard: React.FC = () => {
       onClick={handleWhiteboardClick}
       tabIndex={0} // Make div focusable to capture paste events
     >
-      <div className="absolute inset-0 min-w-full min-h-full">
+      <div 
+        className="absolute inset-0 min-w-full min-h-full"
+        style={{
+          transform: `scale(${zoom})`,
+          transformOrigin: '0 0',
+          transition: 'transform 0.1s ease-out'
+        }}
+      >
         {/* Grid background */}
         <div className="absolute inset-0 bg-grid-pattern" />
 
@@ -219,6 +239,38 @@ const Whiteboard: React.FC = () => {
         </div>
       )}
 
+      {/* Bottom controls */}
+      <div className="fixed left-4 bottom-4 flex items-center gap-2 bg-white rounded-lg shadow-md p-2 z-10">
+        {/* Zoom controls */}
+        <button
+          onClick={handleZoomOut}
+          className="p-2 hover:bg-gray-100 rounded-full"
+          title="Zoom out"
+          disabled={zoom <= MIN_ZOOM}
+        >
+          <FiZoomOut />
+        </button>
+        <span className="text-sm font-medium min-w-[60px] text-center">
+          {Math.round(zoom * 100)}%
+        </span>
+        <button
+          onClick={handleZoomIn}
+          className="p-2 hover:bg-gray-100 rounded-full"
+          title="Zoom in"
+          disabled={zoom >= MAX_ZOOM}
+        >
+          <FiZoomIn />
+        </button>
+        <button
+          onClick={handleResetZoom}
+          className="p-2 hover:bg-gray-100 rounded-full"
+          title="Reset zoom"
+          disabled={zoom === 1}
+        >
+          <FiMaximize />
+        </button>
+      </div>
+
       {/* Clear All button */}
       {whiteboardItems.length > 0 && (
         <button
@@ -231,10 +283,10 @@ const Whiteboard: React.FC = () => {
               deleteAllItems();
             }
           }}
-          className="absolute bottom-4 right-4 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg flex items-center justify-center"
+          className="fixed bottom-4 right-4 p-2 text-red-500 hover:bg-red-50 rounded-full bg-white shadow-md"
           title="Clear whiteboard"
         >
-          <FiTrash2 size={20} />
+          <FiTrash2 />
         </button>
       )}
     </div>
