@@ -28,6 +28,7 @@ interface WhiteboardToolbarProps {
       | "arrow"
       | "table"
   ) => void;
+  selectedItemType: string | null;
 }
 
 interface ToolbarButtonProps {
@@ -35,6 +36,7 @@ interface ToolbarButtonProps {
   title: string;
   color: string;
   onClick: () => void;
+  isSelected?: boolean;
 }
 
 const ToolbarButton: React.FC<ToolbarButtonProps> = ({
@@ -42,6 +44,7 @@ const ToolbarButton: React.FC<ToolbarButtonProps> = ({
   title,
   color,
   onClick,
+  isSelected = false,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -54,7 +57,11 @@ const ToolbarButton: React.FC<ToolbarButtonProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={`w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-150 ${
-        isHovered ? "bg-gray-100 scale-110" : ""
+        isSelected
+          ? `bg-${color} text-white scale-110`
+          : isHovered
+          ? "bg-gray-100 scale-110"
+          : ""
       } text-${color}`}
       title={title}
     >
@@ -68,7 +75,10 @@ const ToolbarButton: React.FC<ToolbarButtonProps> = ({
   );
 };
 
-const WhiteboardToolbar: React.FC<WhiteboardToolbarProps> = ({ onAddItem }) => {
+const WhiteboardToolbar: React.FC<WhiteboardToolbarProps> = ({
+  onAddItem,
+  selectedItemType,
+}) => {
   const [showShapes, setShowShapes] = useState(false);
 
   const handleAddItem = (
@@ -95,42 +105,49 @@ const WhiteboardToolbar: React.FC<WhiteboardToolbarProps> = ({ onAddItem }) => {
         title="Add Sticky Note"
         color="yellow-500"
         onClick={() => handleAddItem("sticky")}
+        isSelected={selectedItemType === "sticky"}
       />
       <ToolbarButton
         icon={<FiType size={20} />}
         title="Add Text"
         color="gray-700"
         onClick={() => handleAddItem("text")}
+        isSelected={selectedItemType === "text"}
       />
       <ToolbarButton
         icon={<FiBold size={20} />}
         title="Add Heading"
         color="blue-700"
         onClick={() => handleAddItem("heading")}
+        isSelected={selectedItemType === "heading"}
       />
       <ToolbarButton
         icon={<FiList size={20} />}
         title="Add Bullet Points"
         color="green-700"
         onClick={() => handleAddItem("bulletpoints")}
+        isSelected={selectedItemType === "bulletpoints"}
       />
       <ToolbarButton
         icon={<FiGrid size={20} />}
         title="Add Table"
         color="blue-600"
         onClick={() => handleAddItem("table")}
+        isSelected={selectedItemType === "table"}
       />
       <ToolbarButton
         icon={<FiImage size={20} />}
         title="Add Image"
         color="purple-700"
         onClick={() => handleAddItem("image")}
+        isSelected={selectedItemType === "image"}
       />
       <ToolbarButton
         icon={<FiArrowRight size={20} />}
         title="Add Arrow"
         color="red-500"
         onClick={() => handleAddItem("arrow")}
+        isSelected={selectedItemType === "arrow"}
       />
       <div className="relative">
         <ToolbarButton
@@ -138,6 +155,7 @@ const WhiteboardToolbar: React.FC<WhiteboardToolbarProps> = ({ onAddItem }) => {
           title="Shapes"
           color="indigo-500"
           onClick={() => setShowShapes(!showShapes)}
+          isSelected={selectedItemType === "shape"}
         />
 
         {showShapes && (
@@ -147,24 +165,28 @@ const WhiteboardToolbar: React.FC<WhiteboardToolbarProps> = ({ onAddItem }) => {
               title="Rectangle"
               color="blue-500"
               onClick={() => handleAddItem("shape")}
+              isSelected={selectedItemType === "shape"}
             />
             <ToolbarButton
               icon={<FiCircle size={20} />}
               title="Circle"
               color="green-500"
               onClick={() => handleAddItem("shape")}
+              isSelected={selectedItemType === "shape"}
             />
             <ToolbarButton
               icon={<FiTriangle size={20} />}
               title="Triangle"
               color="yellow-500"
               onClick={() => handleAddItem("shape")}
+              isSelected={selectedItemType === "shape"}
             />
             <ToolbarButton
               icon={<FiStar size={20} />}
               title="Star"
               color="pink-500"
               onClick={() => handleAddItem("shape")}
+              isSelected={selectedItemType === "shape"}
             />
           </div>
         )}
@@ -174,6 +196,7 @@ const WhiteboardToolbar: React.FC<WhiteboardToolbarProps> = ({ onAddItem }) => {
         title="Add Connection"
         color="green-500"
         onClick={() => handleAddItem("connection")}
+        isSelected={selectedItemType === "connection"}
       />
     </div>
   );

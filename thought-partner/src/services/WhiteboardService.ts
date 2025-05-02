@@ -120,22 +120,52 @@ export const calculateItemPositions = (
 ): Omit<WhiteboardItem, "id" | "createdAt" | "updatedAt">[] => {
   if (items.length === 0) return [];
 
-  // Start positions - centered in the viewport with some spacing
-  const startX = viewportWidth / 2 - items[0].width! / 2;
-  let currentY = viewportHeight / 3;
+  // Use a grid-like layout for better organization
+  const margin = 20; // Space between items
+  const columns = Math.min(3, items.length); // Max 3 columns
+  const columnWidth = Math.floor((viewportWidth - margin) / columns) - margin;
 
-  // Simple layout: stack items vertically with some spacing
-  return items.map((item) => {
+  // Find a good starting position - avoid overlap with existing items if possible
+  let startX = margin;
+  let startY = margin;
+
+  // If there are existing items, try to find empty space
+  if (existingItems.length > 0) {
+    // Simple approach - find the bottom of the last item and start there
+    const lastItem = existingItems[existingItems.length - 1];
+    startY = lastItem.position.y + (lastItem.height || 200) + margin;
+
+    // If we're too far down, start at the top again but shift right
+    if (startY > viewportHeight - 100) {
+      startY = margin;
+      startX = Math.min(viewportWidth - 300, lastItem.position.x + 300);
+    }
+  }
+
+  return items.map((item, index) => {
+    // Calculate grid position
+    const column = index % columns;
+    const row = Math.floor(index / columns);
+
+    // Calculate position within the grid
+    const x = startX + column * (columnWidth + margin);
+    const y = startY + row * (Math.max(item.height || 200, 200) + margin);
+
+    // Ensure the item is within viewport bounds
+    const boundedX = Math.min(x, viewportWidth - (item.width || 200) - margin);
+    const boundedY = Math.min(
+      y,
+      viewportHeight - (item.height || 200) - margin
+    );
+
+    // Create positioned item
     const newItem = {
       ...item,
       position: {
-        x: startX,
-        y: currentY,
+        x: Math.max(margin, boundedX),
+        y: Math.max(margin, boundedY),
       },
     };
-
-    // Move down for next item with some spacing
-    currentY += (item.height || 150) + 20;
 
     return newItem;
   });

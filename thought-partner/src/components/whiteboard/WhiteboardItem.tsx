@@ -26,6 +26,7 @@ const WhiteboardItem: React.FC<WhiteboardItemProps> = ({
     width: item.width || 200,
     height: item.height || 200,
   });
+  const [position, setPosition] = useState(item.position);
   const [isDrawingArrow, setIsDrawingArrow] = useState(false);
   const [arrowStartPoint, setArrowStartPoint] = useState(
     item.startPoint || { x: 0, y: 0 }
@@ -51,6 +52,11 @@ const WhiteboardItem: React.FC<WhiteboardItemProps> = ({
       width: item.width || 200,
       height: item.height || 200,
     });
+    setPosition(item.position);
+
+    // Also update arrow points if they exist
+    if (item.startPoint) setArrowStartPoint(item.startPoint);
+    if (item.endPoint) setArrowEndPoint(item.endPoint);
   }, [item]);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -81,12 +87,17 @@ const WhiteboardItem: React.FC<WhiteboardItemProps> = ({
   };
 
   const handleResize = (e: any, direction: any, ref: HTMLElement, d: any) => {
+    // Ensure we're not exceeding max dimensions
     const newWidth = Math.min(currentSize.width + d.width, maxWidth);
     const newHeight = Math.min(currentSize.height + d.height, maxHeight);
 
+    // Make sure we don't go below minimum dimensions
+    const finalWidth = Math.max(newWidth, 50);
+    const finalHeight = Math.max(newHeight, 50);
+
     setCurrentSize({
-      width: newWidth,
-      height: newHeight,
+      width: finalWidth,
+      height: finalHeight,
     });
   };
 
@@ -96,12 +107,24 @@ const WhiteboardItem: React.FC<WhiteboardItemProps> = ({
     ref: HTMLElement,
     d: any
   ) => {
+    // Ensure we're not exceeding max dimensions
     const newWidth = Math.min(currentSize.width + d.width, maxWidth);
     const newHeight = Math.min(currentSize.height + d.height, maxHeight);
 
+    // Make sure we don't go below minimum dimensions
+    const finalWidth = Math.max(newWidth, 50);
+    const finalHeight = Math.max(newHeight, 50);
+
+    // Set the size in the component state first
+    setCurrentSize({
+      width: finalWidth,
+      height: finalHeight,
+    });
+
+    // Then update the item in the context
     updateItem(item.id, {
-      width: newWidth,
-      height: newHeight,
+      width: finalWidth,
+      height: finalHeight,
     });
   };
 
@@ -550,23 +573,38 @@ const WhiteboardItem: React.FC<WhiteboardItemProps> = ({
         ref={itemRef}
         drag={isMounted && !isEditing}
         dragMomentum={false}
-        dragElastic={0.1}
+        dragElastic={0}
         whileDrag={{ scale: 1.02, opacity: 0.9 }}
         onDragStart={() => setIsDragging(true)}
-        onDragEnd={(_, info) => {
+        onDrag={(e, info) => {
+          // Update local position state during drag for smoother UI
+          setPosition({
+            x: item.position.x + info.offset.x,
+            y: item.position.y + info.offset.y,
+          });
+        }}
+        onDragEnd={(e, info) => {
           setIsDragging(false);
+
+          // Calculate new position
+          const newX = Math.max(0, item.position.x + info.offset.x);
+          const newY = Math.max(0, item.position.y + info.offset.y);
+
+          // Update local state first
+          setPosition({ x: newX, y: newY });
+
+          // Then update in the context
           updateItem(item.id, {
-            position: {
-              x: item.position.x + info.offset.x,
-              y: item.position.y + info.offset.y,
-            },
+            position: { x: newX, y: newY },
           });
         }}
         style={{
           position: "absolute",
-          left: item.position.x,
-          top: item.position.y,
+          left: position.x,
+          top: position.y,
           zIndex: isDragging ? 10 : isHovered ? 5 : 1,
+          width: currentSize.width,
+          height: currentSize.height,
         }}
         transition={{ type: "spring", damping: 20 }}
         className="transition-shadow"
@@ -619,22 +657,35 @@ const WhiteboardItem: React.FC<WhiteboardItemProps> = ({
       ref={itemRef}
       drag={isMounted && !isEditing}
       dragMomentum={false}
-      dragElastic={0.1}
+      dragElastic={0}
       whileDrag={{ scale: 1.02, opacity: 0.9 }}
       onDragStart={() => setIsDragging(true)}
-      onDragEnd={(_, info) => {
+      onDrag={(e, info) => {
+        // Update local position state during drag for smoother UI
+        setPosition({
+          x: item.position.x + info.offset.x,
+          y: item.position.y + info.offset.y,
+        });
+      }}
+      onDragEnd={(e, info) => {
         setIsDragging(false);
+
+        // Calculate new position
+        const newX = Math.max(0, item.position.x + info.offset.x);
+        const newY = Math.max(0, item.position.y + info.offset.y);
+
+        // Update local state first
+        setPosition({ x: newX, y: newY });
+
+        // Then update in the context
         updateItem(item.id, {
-          position: {
-            x: item.position.x + info.offset.x,
-            y: item.position.y + info.offset.y,
-          },
+          position: { x: newX, y: newY },
         });
       }}
       style={{
         position: "absolute",
-        left: item.position.x,
-        top: item.position.y,
+        left: position.x,
+        top: position.y,
         zIndex: isDragging ? 10 : isHovered ? 5 : 1,
       }}
       transition={{ type: "spring", damping: 20 }}
@@ -648,6 +699,8 @@ const WhiteboardItem: React.FC<WhiteboardItemProps> = ({
         onResizeStop={handleResizeStop}
         minWidth={150}
         minHeight={100}
+        maxWidth={maxWidth}
+        maxHeight={maxHeight}
         className={`relative rounded-md shadow-md ${getBgColor()} ${
           item.createdBy === "agent" ? "border-2 border-primary" : ""
         } ${isHovered ? "shadow-lg" : "shadow-md"}`}
@@ -660,6 +713,16 @@ const WhiteboardItem: React.FC<WhiteboardItemProps> = ({
         }}
         handleClasses={{
           bottomRight: "absolute bottom-0 right-0 w-4 h-4 bg-transparent z-10",
+        }}
+        enable={{
+          top: false,
+          right: false,
+          bottom: false,
+          left: false,
+          topRight: false,
+          bottomRight: true,
+          bottomLeft: false,
+          topLeft: false,
         }}
       >
         <div className="h-full flex flex-col p-3">

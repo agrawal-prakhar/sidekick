@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import WhiteboardItem from "./WhiteboardItem";
 import WhiteboardToolbar from "./WhiteboardToolbar";
 import { useWhiteboard } from "../../context/WhiteboardContext";
@@ -53,36 +53,53 @@ const MAX_DIMENSIONS: Record<
 const Whiteboard: React.FC = () => {
   const { whiteboardItems, addItem, deleteAllItems } = useWhiteboard();
   const whiteboardRef = useRef<HTMLDivElement>(null);
+  const [selectedItemType, setSelectedItemType] = useState<
+    WhiteboardItemType["type"] | null
+  >(null);
 
   const handleAddItem = (type: WhiteboardItemType["type"]) => {
-    const whiteboardEl = whiteboardRef.current;
-    if (!whiteboardEl) return;
+    setSelectedItemType(type);
+  };
 
-    // Calculate center position relative to the viewable area
-    const rect = whiteboardEl.getBoundingClientRect();
-    const scrollLeft = whiteboardEl.scrollLeft;
-    const scrollTop = whiteboardEl.scrollTop;
+  const handleWhiteboardClick = (e: React.MouseEvent) => {
+    if (!selectedItemType || !whiteboardRef.current) return;
 
-    const x = rect.width / 2 + scrollLeft - DEFAULT_DIMENSIONS[type].width / 2;
-    const y = rect.height / 2 + scrollTop - DEFAULT_DIMENSIONS[type].height / 2;
+    // Get the click position relative to the whiteboard
+    const rect = whiteboardRef.current.getBoundingClientRect();
+    const scrollLeft = whiteboardRef.current.scrollLeft;
+    const scrollTop = whiteboardRef.current.scrollTop;
+
+    // Calculate the exact position where the user clicked
+    const x =
+      e.clientX -
+      rect.left +
+      scrollLeft -
+      DEFAULT_DIMENSIONS[selectedItemType].width / 2;
+    const y =
+      e.clientY -
+      rect.top +
+      scrollTop -
+      DEFAULT_DIMENSIONS[selectedItemType].height / 2;
 
     // For arrow type, add start and end points
-    const startPoint = type === "arrow" ? { x: 0, y: 0 } : undefined;
-    const endPoint = type === "arrow" ? { x: 150, y: 0 } : undefined;
+    const startPoint =
+      selectedItemType === "arrow" ? { x: 0, y: 0 } : undefined;
+    const endPoint =
+      selectedItemType === "arrow" ? { x: 150, y: 0 } : undefined;
 
     // For shape type, default to rectangle unless specified
-    const shapeType = type === "shape" ? "rectangle" : undefined;
+    const shapeType = selectedItemType === "shape" ? "rectangle" : undefined;
 
     // For table type, default to 3x3
-    const columns = type === "table" ? 3 : undefined;
-    const rows = type === "table" ? 3 : undefined;
+    const columns = selectedItemType === "table" ? 3 : undefined;
+    const rows = selectedItemType === "table" ? 3 : undefined;
 
     addItem({
-      type,
+      type: selectedItemType,
       position: { x, y },
-      content: DEFAULT_CONTENT[type],
-      width: DEFAULT_DIMENSIONS[type].width,
-      height: DEFAULT_DIMENSIONS[type].height,
+      content: DEFAULT_CONTENT[selectedItemType],
+      width: DEFAULT_DIMENSIONS[selectedItemType].width,
+      height: DEFAULT_DIMENSIONS[selectedItemType].height,
       createdBy: "user",
       startPoint,
       endPoint,
@@ -90,6 +107,9 @@ const Whiteboard: React.FC = () => {
       columns,
       rows,
     });
+
+    // Reset the selected type after placing the item
+    setSelectedItemType(null);
   };
 
   // Handle paste event at the whiteboard level to support direct image paste
@@ -105,7 +125,7 @@ const Whiteboard: React.FC = () => {
             const whiteboardEl = whiteboardRef.current;
             if (!whiteboardEl) return;
 
-            // Calculate center position
+            // Calculate position based on center of viewport
             const rect = whiteboardEl.getBoundingClientRect();
             const scrollLeft = whiteboardEl.scrollLeft;
             const scrollTop = whiteboardEl.scrollTop;
@@ -128,11 +148,35 @@ const Whiteboard: React.FC = () => {
     }
   };
 
+  // Define cursor style based on selected item
+  const getCursorStyle = () => {
+    if (!selectedItemType) return "default";
+    switch (selectedItemType) {
+      case "arrow":
+        return "crosshair";
+      case "sticky":
+        return "cell";
+      case "text":
+        return "text";
+      case "heading":
+        return "text";
+      case "bulletpoints":
+        return "text";
+      case "table":
+        return "cell";
+      default:
+        return "copy";
+    }
+  };
+
   return (
     <div
-      className="flex-1 relative bg-gray-50 overflow-auto whiteboard-container"
+      className={`flex-1 relative bg-gray-50 overflow-auto whiteboard-container ${
+        selectedItemType ? "cursor-" + getCursorStyle() : ""
+      }`}
       ref={whiteboardRef}
       onPaste={handlePaste}
+      onClick={handleWhiteboardClick}
       tabIndex={0} // Make div focusable to capture paste events
     >
       <div className="absolute inset-0 min-w-full min-h-full">
@@ -151,7 +195,29 @@ const Whiteboard: React.FC = () => {
       </div>
 
       {/* Toolbar */}
-      <WhiteboardToolbar onAddItem={handleAddItem} />
+      <WhiteboardToolbar
+        onAddItem={handleAddItem}
+        selectedItemType={selectedItemType}
+      />
+
+      {/* Selection mode indicator */}
+      {selectedItemType && (
+        <div className="fixed top-4 right-4 bg-white rounded-lg shadow-md p-2 z-10">
+          <span className="text-sm font-medium">
+            Click on the whiteboard to place a{" "}
+            <span className="capitalize">{selectedItemType}</span>
+            <button
+              className="ml-2 text-red-500"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedItemType(null);
+              }}
+            >
+              Cancel
+            </button>
+          </span>
+        </div>
+      )}
 
       {/* Clear All button */}
       {whiteboardItems.length > 0 && (
