@@ -1,101 +1,66 @@
-import React, { useState, FormEvent } from "react";
-import { FiSend, FiMic, FiMicOff } from "react-icons/fi";
-import { useVoiceAgent } from "../../context/VoiceAgentContext";
+import React, { useState } from 'react';
+import { FiMic, FiMicOff, FiSend } from 'react-icons/fi';
+import { useVoiceAgent } from '../../../src/context/VoiceAgentContext';
+import { useWhiteboard } from '../../../src/context/WhiteboardContext';
 
 interface ChatInputProps {
-  onSendMessage: (content: string) => void;
+  onSendMessage: (message: string) => void;
   isLoading?: boolean;
 }
 
-const ChatInput: React.FC<ChatInputProps> = ({
-  onSendMessage,
-  isLoading = false,
-}) => {
-  const [message, setMessage] = useState("");
+const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading = false }) => {
+  const [message, setMessage] = useState('');
   const { isVoiceActive, startVoiceAgent, stopVoiceAgent } = useVoiceAgent();
+  const { whiteboardItems } = useWhiteboard();
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim() && !isLoading) {
       onSendMessage(message);
-      setMessage("");
+      setMessage('');
     }
   };
 
   const toggleVoiceAgent = async () => {
-    try {
-      if (isVoiceActive) {
-        stopVoiceAgent();
-      } else {
-        const sampleWhiteboard = {
-          projectName: "Checkout Flow",
-          components: [
-            { id: "btn-pay", type: "button", text: "Pay", x: 120, y: 60 },
-            { id: "txt-amount", type: "textbox", placeholder: "$0.00", x: 40, y: 60 },
-            { id: "icon-card", type: "icon", name: "credit-card", x: 10, y: 55 }
-          ],
-          constraints: {
-            stack: "React + Node 18",
-            db: "Postgres",
-            cloud: "AWS"
-          },
-          targetQPS: 75
-        };
-        await startVoiceAgent();
+    if (isVoiceActive) {
+      stopVoiceAgent();
+    } else {
+      try {
+        await startVoiceAgent(whiteboardItems);
+      } catch (error) {
+        console.error('Failed to start voice agent:', error);
       }
-    } catch (error) {
-      console.error('Failed to toggle voice agent:', error);
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="border-t border-gray-200 bg-white p-4"
-    >
-      <div className="flex items-center rounded-lg border border-gray-300 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:border-primary">
-        <textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Ask the Master Agent anything..."
-          className="flex-1 px-4 py-2 resize-none h-12 max-h-40 focus:outline-none"
-          rows={1}
-          disabled={isLoading}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              handleSubmit(e);
-            }
-          }}
-        />
-        <button
-          type="button"
-          onClick={toggleVoiceAgent}
-          className={`p-3 ${
-            isVoiceActive
-              ? "text-red-500 hover:bg-red-50"
-              : "text-gray-500 hover:bg-gray-100"
-          }`}
-          title={isVoiceActive ? "Stop voice input" : "Start voice input"}
-        >
-          {isVoiceActive ? <FiMicOff size={20} /> : <FiMic size={20} />}
-        </button>
-        <button
-          type="submit"
-          disabled={!message.trim() || isLoading}
-          className={`p-3 ${
-            !message.trim() || isLoading
-              ? "text-gray-400"
-              : "text-primary hover:bg-gray-100"
-          }`}
-        >
-          <FiSend size={20} />
-        </button>
-      </div>
-      <div className="text-xs text-gray-500 mt-2">
-        Press Enter to send, Shift+Enter for a new line
-        {isVoiceActive && " • Voice input active"}
-      </div>
+    <form onSubmit={handleSubmit} className="flex items-center gap-2 p-4 border-t">
+      <textarea
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder="Type your message..."
+        className="flex-1 p-2 border rounded-lg resize-none"
+        rows={1}
+        disabled={isLoading}
+      />
+      <button
+        type="button"
+        onClick={toggleVoiceAgent}
+        className={`p-2 rounded-full ${
+          isVoiceActive ? 'bg-red-500 text-white' : 'bg-gray-200'
+        }`}
+        title={isVoiceActive ? 'Stop voice input' : 'Start voice input'}
+        disabled={isLoading}
+      >
+        {isVoiceActive ? <FiMicOff /> : <FiMic />}
+      </button>
+      <button
+        type="submit"
+        className="p-2 bg-blue-500 text-white rounded-full disabled:opacity-50"
+        disabled={!message.trim() || isLoading}
+      >
+        <FiSend />
+      </button>
     </form>
   );
 };

@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import Vapi from '@vapi-ai/web';
+import { WhiteboardItem } from '../types';
 
 interface VoiceAgentContextType {
   isVoiceActive: boolean;
-  startVoiceAgent: () => Promise<void>;
+  startVoiceAgent: (whiteboardItems: WhiteboardItem[]) => Promise<void>;
   stopVoiceAgent: () => void;
   sendVoiceMessage: (text: string) => void;
 }
@@ -18,11 +19,21 @@ export const useVoiceAgent = () => {
   return context;
 };
 
+const buildSystemPrompt = (basePrompt: string, whiteboardItems: WhiteboardItem[]) => {
+  const whiteboardContext = JSON.stringify(whiteboardItems, null, 2);
+  return `${basePrompt}
+
+Current whiteboard context:
+${whiteboardContext}
+
+Please take this whiteboard context into account when responding. You can reference specific items on the whiteboard and suggest improvements or additions.`;
+};
+
 export const VoiceAgentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [vapi, setVapi] = useState<Vapi | null>(null);
 
-  const startVoiceAgent = useCallback(async () => {
+  const startVoiceAgent = useCallback(async (whiteboardItems: WhiteboardItem[]) => {
     try {
       // Initialize Vapi with your API key
       const vapiInstance = new Vapi(process.env.REACT_APP_VAPI_KEY || '');
@@ -35,7 +46,8 @@ export const VoiceAgentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const basePrompt =
         "You are a voice-based AI assistant for technical Product Managers. " +
         "Keep your responses short, clear, and voice-friendly. " +
-        "Speak like a confident peer: casual, but never vague.";
+        "Speak like a confident peer: casual, but never vague. " +
+        "You can see the current state of the whiteboard and should reference it in your responses.";
 
       const assistantConfig = {
         name: "PM Assistant",
@@ -50,7 +62,7 @@ export const VoiceAgentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           messages: [
             {
               role: "system" as const,
-              content: basePrompt,
+              content: buildSystemPrompt(basePrompt, whiteboardItems),
             },
           ],
         },
