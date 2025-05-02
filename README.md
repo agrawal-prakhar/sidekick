@@ -1,1 +1,1 @@
-AI agent for founder networking.
+The A2A thought partner for PMs.
