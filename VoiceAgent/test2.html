@@ -1,0 +1,20 @@
+<!doctype html>
+<html><body>
+<button id="start">▶️  Start Design Assistant</button>
+
+<script type="module">
+  import Vapi from "https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/+esm";
+
+  const vapi = new Vapi("129a98bb-bbcb-444c-b880-7e601d0b5dbbY");      // Dashboard → Settings → Web SDK Key
+  vapi.on("*", e => console.log("[Vapi]", e));
+
+  document.getElementById("start").onclick = () => {
+    vapi.start({
+      name: "Inline test",
+      transcriber: { provider: "deepgram", model: "nova-2", language: "en-US" },
+      model: { provider: "vapi-opal", messages: [{ role: "system", content: "Hi!" }] },
+      voice: { provider: "playht", voiceId: "jennifer" }
+    });
+  };
+</script>
+</body></html>

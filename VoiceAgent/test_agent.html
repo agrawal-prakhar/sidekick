@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Vapi quick test</title>
+</head>
+<body>
+  <button id="start-btn">▶️  Start Design Assistant</button>
+  <button id="hangup-btn" disabled>⏹️  Hang up</button>
+
+  <script type="module">
+    import { Vapi } from "https://cdn.jsdelivr.net/npm/@vapi-ai/web/dist/index.esm.js";
+
+    const PUBLIC_WEB_KEY = "129a98bb-bbcb-444c-b880-7e601d0b5dbb";
+
+    const vapi = new Vapi(PUBLIC_WEB_KEY);
+    vapi.on("*", (evt) => {
+  // You’ll see things like { type: "state-change", state: "connecting" }
+  console.log("[Vapi]", evt);
+});
+    let currentCall = null;
+
+    const systemPrompt = `
+You are a voice-based AI assistant for technical Product Managers. 
+`;
+
+    async function startCall() {
+      const assistantConfig = {
+        name: "PM Voice Assistant (No Whiteboard Yet)",
+        transcriber: { provider: "deepgram", model: "nova-2", language: "en-US" },
+        model: {
+          provider: "openai",
+          model: "gpt-4o-mini",
+          messages: [{ role: "system", content: systemPrompt }],
+        },
+        voice: { provider: "playht", voiceId: "jennifer" },
+        // No tools section for now – so the LLM won't try to call functions
+      };
+
+      currentCall = await vapi.startCall(assistantConfig);
+      document.getElementById("hangup-btn").disabled = false;
+    }
+
+    // ----- UI buttons -----
+    document.getElementById("start-btn").onclick = startCall;
+    document.getElementById("hangup-btn").onclick = () => {
+      vapi.hangUp();
+      document.getElementById("hangup-btn").disabled = true;
+    };
+
+    // ----- Debug: log everything -----
+    vapi.on("*", (evt) => console.log("[Vapi event]", evt));
+  </script>
+</body>
+</html>

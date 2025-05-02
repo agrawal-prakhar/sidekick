@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<body>
+  <button id="start">▶️ Run voice test</button>
+
+  <script type="module">
+    import { startDesignAssistant } from "./agent.js";
+
+    /* Load the dummy JSON at runtime (works in Vite/webpack dev server) */
+    fetch("./samplewhiteboard.json")
+      .then(r => r.json())
+      .then((designJSON) => {
+        document.getElementById("start").onclick = () => {
+          startDesignAssistant(designJSON)
+            .then(call => console.log("Call started:", call.id))
+            .catch(err => console.error("Failed:", err));
+        };
+      });
+  </script>
+</body>
+</html>

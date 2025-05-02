@@ -1,5 +1,6 @@
 import React, { useState, FormEvent } from "react";
-import { FiSend } from "react-icons/fi";
+import { FiSend, FiMic, FiMicOff } from "react-icons/fi";
+import { useVoiceAgent } from "../../context/VoiceAgentContext";
 
 interface ChatInputProps {
   onSendMessage: (content: string) => void;
@@ -11,12 +12,39 @@ const ChatInput: React.FC<ChatInputProps> = ({
   isLoading = false,
 }) => {
   const [message, setMessage] = useState("");
+  const { isVoiceActive, startVoiceAgent, stopVoiceAgent } = useVoiceAgent();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (message.trim() && !isLoading) {
       onSendMessage(message);
       setMessage("");
+    }
+  };
+
+  const toggleVoiceAgent = async () => {
+    try {
+      if (isVoiceActive) {
+        stopVoiceAgent();
+      } else {
+        const sampleWhiteboard = {
+          projectName: "Checkout Flow",
+          components: [
+            { id: "btn-pay", type: "button", text: "Pay", x: 120, y: 60 },
+            { id: "txt-amount", type: "textbox", placeholder: "$0.00", x: 40, y: 60 },
+            { id: "icon-card", type: "icon", name: "credit-card", x: 10, y: 55 }
+          ],
+          constraints: {
+            stack: "React + Node 18",
+            db: "Postgres",
+            cloud: "AWS"
+          },
+          targetQPS: 75
+        };
+        await startVoiceAgent();
+      }
+    } catch (error) {
+      console.error('Failed to toggle voice agent:', error);
     }
   };
 
@@ -41,6 +69,18 @@ const ChatInput: React.FC<ChatInputProps> = ({
           }}
         />
         <button
+          type="button"
+          onClick={toggleVoiceAgent}
+          className={`p-3 ${
+            isVoiceActive
+              ? "text-red-500 hover:bg-red-50"
+              : "text-gray-500 hover:bg-gray-100"
+          }`}
+          title={isVoiceActive ? "Stop voice input" : "Start voice input"}
+        >
+          {isVoiceActive ? <FiMicOff size={20} /> : <FiMic size={20} />}
+        </button>
+        <button
           type="submit"
           disabled={!message.trim() || isLoading}
           className={`p-3 ${
@@ -54,6 +94,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
       </div>
       <div className="text-xs text-gray-500 mt-2">
         Press Enter to send, Shift+Enter for a new line
+        {isVoiceActive && " • Voice input active"}
       </div>
     </form>
   );

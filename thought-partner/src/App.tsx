@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { WhiteboardProvider } from "./context/WhiteboardContext";
+import { VoiceAgentProvider } from "./context/VoiceAgentContext";
 import Layout from "./components/layout/Layout";
 import Whiteboard from "./components/whiteboard/Whiteboard";
 import ChatPanel from "./components/chat/ChatPanel";
@@ -16,16 +17,16 @@ const WelcomeMessages: React.FC = () => {
       addMessage({
         role: "agent",
         content:
-          "Welcome to ThoughtPartner! I'm your PM assistant. To get started, try adding items to the whiteboard using the toolbar on the left, or ask me a question about product management.",
+          "Welcome to ThoughtPartner! I'm your PM assistant. To get started, try adding items to the whiteboard using the toolbar on the left, or ask me a question about product management. You can also use voice input by clicking the microphone icon in the chat input.",
         relatedItems: [],
       });
 
       // Add API key info message
-      if (!process.env.REACT_APP_OPENAI_API_KEY) {
+      if (!process.env.REACT_APP_VAPI_KEY) {
         addMessage({
           role: "agent",
           content:
-            "Add your OpenAI API key to a .env file as REACT_APP_OPENAI_API_KEY for real AI functionality. Currently showing pre-written responses.",
+            "Add your Vapi API key to a .env file as REACT_APP_VAPI_KEY for voice functionality. Currently showing pre-written responses.",
           relatedItems: [],
         });
       }
@@ -50,7 +51,9 @@ function AppContent() {
 function App() {
   return (
     <WhiteboardProvider>
-      <AppContent />
+      <VoiceAgentProvider>
+        <AppContent />
+      </VoiceAgentProvider>
     </WhiteboardProvider>
   );
 }

@@ -14,6 +14,7 @@
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "@types/uuid": "^10.0.0",
+    "@vapi-ai/web": "^2.2.7",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.9.4",
     "konva": "^9.3.20",
