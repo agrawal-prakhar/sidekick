@@ -9,7 +9,8 @@ export type WhiteboardItem = {
     | "connection"
     | "heading"
     | "bulletpoints"
-    | "arrow";
+    | "arrow"
+    | "table";
   position: { x: number; y: number };
   content: string;
   width?: number;
@@ -23,6 +24,9 @@ export type WhiteboardItem = {
   // For arrows
   startPoint?: { x: number; y: number };
   endPoint?: { x: number; y: number };
+  // For tables
+  columns?: number;
+  rows?: number;
 };
 
 // Chat message types

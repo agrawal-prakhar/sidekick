@@ -18,6 +18,7 @@ interface WhiteboardContextProps {
   ) => string;
   updateItem: (id: string, updates: Partial<WhiteboardItem>) => void;
   deleteItem: (id: string) => void;
+  deleteAllItems: () => void;
   addMessage: (message: Omit<ChatMessage, "id" | "timestamp">) => void;
   updateProject: (updates: Partial<Project>) => void;
 }
@@ -136,6 +137,14 @@ export const WhiteboardProvider: React.FC<WhiteboardProviderProps> = ({
     }));
   };
 
+  const deleteAllItems = () => {
+    setProject((prev) => ({
+      ...prev,
+      items: [],
+      updatedAt: new Date(),
+    }));
+  };
+
   const addMessage = (message: Omit<ChatMessage, "id" | "timestamp">) => {
     const newMessage: ChatMessage = {
       ...message,
@@ -167,6 +176,7 @@ export const WhiteboardProvider: React.FC<WhiteboardProviderProps> = ({
         addItem,
         updateItem,
         deleteItem,
+        deleteAllItems,
         addMessage,
         updateProject,
       }}

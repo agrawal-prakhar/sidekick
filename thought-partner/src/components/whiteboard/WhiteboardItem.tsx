@@ -7,9 +7,15 @@ import { Resizable } from "re-resizable";
 
 interface WhiteboardItemProps {
   item: WhiteboardItemType;
+  maxWidth?: number;
+  maxHeight?: number;
 }
 
-const WhiteboardItem: React.FC<WhiteboardItemProps> = ({ item }) => {
+const WhiteboardItem: React.FC<WhiteboardItemProps> = ({
+  item,
+  maxWidth = 800,
+  maxHeight = 800,
+}) => {
   const { updateItem, deleteItem } = useWhiteboard();
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(item.content);
@@ -20,6 +26,13 @@ const WhiteboardItem: React.FC<WhiteboardItemProps> = ({ item }) => {
     width: item.width || 200,
     height: item.height || 200,
   });
+  const [isDrawingArrow, setIsDrawingArrow] = useState(false);
+  const [arrowStartPoint, setArrowStartPoint] = useState(
+    item.startPoint || { x: 0, y: 0 }
+  );
+  const [arrowEndPoint, setArrowEndPoint] = useState(
+    item.endPoint || { x: 150, y: 0 }
+  );
   const itemRef = useRef<HTMLDivElement>(null);
 
   // Ensure the component is fully mounted before enabling drag
@@ -68,9 +81,12 @@ const WhiteboardItem: React.FC<WhiteboardItemProps> = ({ item }) => {
   };
 
   const handleResize = (e: any, direction: any, ref: HTMLElement, d: any) => {
+    const newWidth = Math.min(currentSize.width + d.width, maxWidth);
+    const newHeight = Math.min(currentSize.height + d.height, maxHeight);
+
     setCurrentSize({
-      width: currentSize.width + d.width,
-      height: currentSize.height + d.height,
+      width: newWidth,
+      height: newHeight,
     });
   };
 
@@ -80,8 +96,9 @@ const WhiteboardItem: React.FC<WhiteboardItemProps> = ({ item }) => {
     ref: HTMLElement,
     d: any
   ) => {
-    const newWidth = currentSize.width + d.width;
-    const newHeight = currentSize.height + d.height;
+    const newWidth = Math.min(currentSize.width + d.width, maxWidth);
+    const newHeight = Math.min(currentSize.height + d.height, maxHeight);
+
     updateItem(item.id, {
       width: newWidth,
       height: newHeight,
@@ -127,23 +144,65 @@ const WhiteboardItem: React.FC<WhiteboardItemProps> = ({ item }) => {
         return "bg-green-100";
       case "arrow":
         return "bg-transparent";
+      case "table":
+        return "bg-white";
       default:
         return "bg-white";
     }
   };
 
+  const handleArrowMouseDown = (e: React.MouseEvent) => {
+    if (item.type !== "arrow" || isDragging) return;
+
+    setIsDrawingArrow(true);
+    const svg = e.currentTarget as SVGSVGElement;
+    const rect = svg.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    setArrowStartPoint({ x, y });
+    setArrowEndPoint({ x, y });
+
+    document.addEventListener("mousemove", handleArrowMouseMove);
+    document.addEventListener("mouseup", handleArrowMouseUp);
+  };
+
+  const handleArrowMouseMove = (e: MouseEvent) => {
+    if (!isDrawingArrow || !itemRef.current) return;
+
+    const svg = itemRef.current.querySelector("svg");
+    if (!svg) return;
+
+    const rect = svg.getBoundingClientRect();
+    const x = Math.min(Math.max(0, e.clientX - rect.left), currentSize.width);
+    const y = Math.min(Math.max(0, e.clientY - rect.top), currentSize.height);
+
+    setArrowEndPoint({ x, y });
+  };
+
+  const handleArrowMouseUp = () => {
+    setIsDrawingArrow(false);
+    document.removeEventListener("mousemove", handleArrowMouseMove);
+    document.removeEventListener("mouseup", handleArrowMouseUp);
+
+    updateItem(item.id, {
+      startPoint: arrowStartPoint,
+      endPoint: arrowEndPoint,
+    });
+  };
+
   const renderArrow = () => {
-    const startX = item.startPoint?.x || 0;
-    const startY = item.startPoint?.y || 0;
-    const endX = item.endPoint?.x || 150;
-    const endY = item.endPoint?.y || 0;
+    const startX = arrowStartPoint.x;
+    const startY = arrowStartPoint.y;
+    const endX = arrowEndPoint.x;
+    const endY = arrowEndPoint.y;
 
     return (
       <svg
         width="100%"
         height="100%"
-        className="cursor-pointer"
-        onClick={handleContentClick}
+        className="cursor-crosshair"
+        onMouseDown={handleArrowMouseDown}
       >
         <defs>
           <marker
@@ -159,9 +218,9 @@ const WhiteboardItem: React.FC<WhiteboardItemProps> = ({ item }) => {
         </defs>
         <line
           x1={startX}
-          y1={startY + 25}
+          y1={startY}
           x2={endX}
-          y2={endY + 25}
+          y2={endY}
           stroke="#000"
           strokeWidth="2"
           markerEnd={`url(#arrowhead-${item.id})`}
@@ -170,24 +229,66 @@ const WhiteboardItem: React.FC<WhiteboardItemProps> = ({ item }) => {
           <g>
             <circle
               cx={startX}
-              cy={startY + 25}
-              r="5"
+              cy={startY}
+              r="6"
               fill="blue"
+              stroke="white"
+              strokeWidth="2"
               className="cursor-move"
               onMouseDown={(e) => {
                 e.stopPropagation();
                 // Handle start point dragging
+                setIsDrawingArrow(true);
+                document.addEventListener("mousemove", (evt) => {
+                  if (!itemRef.current) return;
+                  const svg = itemRef.current.querySelector("svg");
+                  if (!svg) return;
+                  const rect = svg.getBoundingClientRect();
+                  const x = Math.min(
+                    Math.max(0, evt.clientX - rect.left),
+                    currentSize.width
+                  );
+                  const y = Math.min(
+                    Math.max(0, evt.clientY - rect.top),
+                    currentSize.height
+                  );
+                  setArrowStartPoint({ x, y });
+                });
+                document.addEventListener("mouseup", handleArrowMouseUp, {
+                  once: true,
+                });
               }}
             />
             <circle
               cx={endX}
-              cy={endY + 25}
-              r="5"
+              cy={endY}
+              r="6"
               fill="blue"
+              stroke="white"
+              strokeWidth="2"
               className="cursor-move"
               onMouseDown={(e) => {
                 e.stopPropagation();
                 // Handle end point dragging
+                setIsDrawingArrow(true);
+                document.addEventListener("mousemove", (evt) => {
+                  if (!itemRef.current) return;
+                  const svg = itemRef.current.querySelector("svg");
+                  if (!svg) return;
+                  const rect = svg.getBoundingClientRect();
+                  const x = Math.min(
+                    Math.max(0, evt.clientX - rect.left),
+                    currentSize.width
+                  );
+                  const y = Math.min(
+                    Math.max(0, evt.clientY - rect.top),
+                    currentSize.height
+                  );
+                  setArrowEndPoint({ x, y });
+                });
+                document.addEventListener("mouseup", handleArrowMouseUp, {
+                  once: true,
+                });
               }}
             />
           </g>
@@ -296,6 +397,60 @@ const WhiteboardItem: React.FC<WhiteboardItemProps> = ({ item }) => {
     }
   };
 
+  const renderTableContent = () => {
+    if (isEditing) {
+      return (
+        <textarea
+          value={content}
+          onChange={handleContentChange}
+          onBlur={handleContentBlur}
+          className="w-full h-full p-2 bg-transparent resize-none focus:outline-none"
+          autoFocus
+          placeholder="Use CSV format: cell1,cell2,cell3"
+        />
+      );
+    }
+
+    // Split content into rows and cells
+    const rows = content.split("\n");
+
+    return (
+      <div className="overflow-auto h-full">
+        <table className="min-w-full border-collapse">
+          <tbody>
+            {rows.map((row, rowIndex) => {
+              const cells = row.split(",");
+              return (
+                <tr
+                  key={rowIndex}
+                  className={rowIndex === 0 ? "bg-gray-100" : ""}
+                >
+                  {cells.map((cell, cellIndex) => {
+                    return rowIndex === 0 ? (
+                      <th
+                        key={cellIndex}
+                        className="border border-gray-300 p-2 text-left"
+                      >
+                        {cell}
+                      </th>
+                    ) : (
+                      <td
+                        key={cellIndex}
+                        className="border border-gray-300 p-2"
+                      >
+                        {cell}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
   const renderContent = () => {
     if (isEditing) {
       return (
@@ -305,7 +460,7 @@ const WhiteboardItem: React.FC<WhiteboardItemProps> = ({ item }) => {
           onBlur={handleContentBlur}
           onPaste={handlePaste}
           autoFocus
-          className="w-full h-full min-h-[100px] p-2 bg-transparent focus:outline-none resize-none border border-gray-300 rounded"
+          className="w-full h-full min-h-[100px] p-2 bg-transparent focus:outline-none border border-gray-300 rounded"
         />
       );
     }
@@ -372,6 +527,10 @@ const WhiteboardItem: React.FC<WhiteboardItemProps> = ({ item }) => {
 
     if (item.type === "shape") {
       return renderShape();
+    }
+
+    if (item.type === "table") {
+      return renderTableContent();
     }
 
     return (

@@ -13,6 +13,7 @@ const DEFAULT_DIMENSIONS: Record<
   heading: { width: 400, height: 100 },
   bulletpoints: { width: 300, height: 200 },
   arrow: { width: 200, height: 50 },
+  table: { width: 400, height: 250 },
 };
 
 // Commands recognized in chat that will trigger whiteboard item creation
@@ -22,6 +23,7 @@ const WHITEBOARD_COMMANDS = {
   CREATE_BULLETPOINTS:
     /\[create bulletpoints\](.*?)\[\/create bulletpoints\]/is,
   CREATE_TEXT: /\[create text\](.*?)\[\/create text\]/is,
+  CREATE_TABLE: /\[create table\](.*?)\[\/create table\]/is,
 };
 
 /**
@@ -87,6 +89,9 @@ export const parseAgentResponseForWhiteboardItems = (
 
   // Extract all text blocks
   cleanedContent = extractAllItems(WHITEBOARD_COMMANDS.CREATE_TEXT, "text");
+
+  // Extract all tables
+  cleanedContent = extractAllItems(WHITEBOARD_COMMANDS.CREATE_TABLE, "table");
 
   // If we found any commands to create items, add a note about it
   if (whiteboardItems.length > 0) {

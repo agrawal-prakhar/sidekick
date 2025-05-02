@@ -12,6 +12,7 @@ import {
   FiStar,
   FiTriangle,
   FiBold,
+  FiGrid,
 } from "react-icons/fi";
 
 interface WhiteboardToolbarProps {
@@ -25,6 +26,7 @@ interface WhiteboardToolbarProps {
       | "heading"
       | "bulletpoints"
       | "arrow"
+      | "table"
   ) => void;
 }
 
@@ -79,6 +81,7 @@ const WhiteboardToolbar: React.FC<WhiteboardToolbarProps> = ({ onAddItem }) => {
       | "heading"
       | "bulletpoints"
       | "arrow"
+      | "table"
   ) => {
     console.log("Adding item:", type);
     onAddItem(type);
@@ -110,6 +113,12 @@ const WhiteboardToolbar: React.FC<WhiteboardToolbarProps> = ({ onAddItem }) => {
         title="Add Bullet Points"
         color="green-700"
         onClick={() => handleAddItem("bulletpoints")}
+      />
+      <ToolbarButton
+        icon={<FiGrid size={20} />}
+        title="Add Table"
+        color="blue-600"
+        onClick={() => handleAddItem("table")}
       />
       <ToolbarButton
         icon={<FiImage size={20} />}

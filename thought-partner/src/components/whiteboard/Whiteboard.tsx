@@ -3,6 +3,7 @@ import WhiteboardItem from "./WhiteboardItem";
 import WhiteboardToolbar from "./WhiteboardToolbar";
 import { useWhiteboard } from "../../context/WhiteboardContext";
 import { WhiteboardItem as WhiteboardItemType } from "../../types";
+import { FiTrash2 } from "react-icons/fi";
 
 const DEFAULT_CONTENT: Record<WhiteboardItemType["type"], string> = {
   sticky: "Add your notes here...",
@@ -13,6 +14,8 @@ const DEFAULT_CONTENT: Record<WhiteboardItemType["type"], string> = {
   heading: "# Main Heading",
   bulletpoints: "• First item\n• Second item\n• Third item",
   arrow: "→",
+  table:
+    "Header 1,Header 2,Header 3\nRow 1 Cell 1,Row 1 Cell 2,Row 1 Cell 3\nRow 2 Cell 1,Row 2 Cell 2,Row 2 Cell 3",
 };
 
 // Default width and height for different item types
@@ -28,10 +31,27 @@ const DEFAULT_DIMENSIONS: Record<
   heading: { width: 400, height: 100 },
   bulletpoints: { width: 300, height: 150 },
   arrow: { width: 200, height: 50 },
+  table: { width: 400, height: 200 },
+};
+
+// Maximum allowed dimensions for resizing
+const MAX_DIMENSIONS: Record<
+  WhiteboardItemType["type"],
+  { width: number; height: number }
+> = {
+  sticky: { width: 400, height: 600 },
+  text: { width: 600, height: 800 },
+  image: { width: 800, height: 800 },
+  shape: { width: 400, height: 400 },
+  connection: { width: 400, height: 200 },
+  heading: { width: 800, height: 200 },
+  bulletpoints: { width: 600, height: 800 },
+  arrow: { width: 800, height: 200 },
+  table: { width: 800, height: 600 },
 };
 
 const Whiteboard: React.FC = () => {
-  const { whiteboardItems, addItem } = useWhiteboard();
+  const { whiteboardItems, addItem, deleteAllItems } = useWhiteboard();
   const whiteboardRef = useRef<HTMLDivElement>(null);
 
   const handleAddItem = (type: WhiteboardItemType["type"]) => {
@@ -53,6 +73,10 @@ const Whiteboard: React.FC = () => {
     // For shape type, default to rectangle unless specified
     const shapeType = type === "shape" ? "rectangle" : undefined;
 
+    // For table type, default to 3x3
+    const columns = type === "table" ? 3 : undefined;
+    const rows = type === "table" ? 3 : undefined;
+
     addItem({
       type,
       position: { x, y },
@@ -63,6 +87,8 @@ const Whiteboard: React.FC = () => {
       startPoint,
       endPoint,
       shapeType,
+      columns,
+      rows,
     });
   };
 
@@ -115,12 +141,36 @@ const Whiteboard: React.FC = () => {
 
         {/* Whiteboard items */}
         {whiteboardItems.map((item) => (
-          <WhiteboardItem key={item.id} item={item} />
+          <WhiteboardItem
+            key={item.id}
+            item={item}
+            maxWidth={MAX_DIMENSIONS[item.type].width}
+            maxHeight={MAX_DIMENSIONS[item.type].height}
+          />
         ))}
       </div>
 
       {/* Toolbar */}
       <WhiteboardToolbar onAddItem={handleAddItem} />
+
+      {/* Clear All button */}
+      {whiteboardItems.length > 0 && (
+        <button
+          onClick={() => {
+            if (
+              window.confirm(
+                "Are you sure you want to clear the whiteboard? This action cannot be undone."
+              )
+            ) {
+              deleteAllItems();
+            }
+          }}
+          className="absolute bottom-4 right-4 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg flex items-center justify-center"
+          title="Clear whiteboard"
+        >
+          <FiTrash2 size={20} />
+        </button>
+      )}
     </div>
   );
 };

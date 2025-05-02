@@ -37,6 +37,7 @@ const debugCreateWhiteboardItems = (content: string): string => {
     "create",
     "plan",
     "structure",
+    "table",
   ];
 
   if (triggerWords.some((word) => content.toLowerCase().includes(word))) {
@@ -57,6 +58,12 @@ Here's how we might structure this project:
 • Phase 3: Development
 • Phase 4: Testing
 • Phase 5: Launch & Monitoring[/create bulletpoints]
+
+[create table]Project Timeline,Phase 1,Phase 2,Phase 3
+Research,2 weeks,N/A,N/A
+Design,1 week,3 weeks,N/A
+Development,N/A,2 weeks,4 weeks
+Testing,N/A,1 week,2 weeks[/create table]
 
 [create text]This approach will help us maintain focus on our key objectives while ensuring we follow a structured methodology. Let me know if you'd like to adjust any of these phases or goals.[/create text]`;
   }
@@ -117,6 +124,7 @@ export const generateAgentResponse = async (
         - [create heading]heading text[/create heading]
         - [create bulletpoints]• point 1\n• point 2\n• point 3[/create bulletpoints]
         - [create text]longer text content[/create text]
+        - [create table]Header 1,Header 2,Header 3\nRow 1 Cell 1,Row 1 Cell 2,Row 1 Cell 3\nRow 2 Cell 1,Row 2 Cell 2,Row 2 Cell 3[/create table]
         
         Use these commands to help organize information visually on the whiteboard.
         Context about the current project: ${projectContext}`,
@@ -133,6 +141,7 @@ export const generateAgentResponse = async (
         - [create heading]heading text[/create heading]
         - [create bulletpoints]• point 1\n• point 2\n• point 3[/create bulletpoints]
         - [create text]longer text content[/create text]
+        - [create table]Header 1,Header 2,Header 3\nRow 1 Cell 1,Row 1 Cell 2,Row 1 Cell 3\nRow 2 Cell 1,Row 2 Cell 2,Row 2 Cell 3[/create table]
         
         Use these commands to help organize information visually on the whiteboard.`,
       });
