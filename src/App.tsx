@@ -6,7 +6,7 @@ import Whiteboard from "./components/whiteboard/Whiteboard";
 import ChatPanel from "./components/chat/ChatPanel";
 import { useWhiteboard } from "./context/WhiteboardContext";
 
-// Welcome component to add initial messages
+// Welcome component to add initial messages and API key info
 const WelcomeMessages: React.FC = () => {
   const { chatMessages, addMessage } = useWhiteboard();
 

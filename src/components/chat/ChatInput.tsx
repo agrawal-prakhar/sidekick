@@ -2,6 +2,8 @@ import React, { useState, FormEvent } from "react";
 import { FiSend, FiMic, FiMicOff } from "react-icons/fi";
 import { useVoiceAgent } from "../../context/VoiceAgentContext";
 
+// Chat Input component with voice and text input capabilities
+
 interface ChatInputProps {
   onSendMessage: (content: string) => void;
   isLoading?: boolean;

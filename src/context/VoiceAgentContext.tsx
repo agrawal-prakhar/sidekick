@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import Vapi from '@vapi-ai/web';
 
+// Voice Agent Context for managing Vapi integration and voice interactions
+
 interface VoiceAgentContextType {
   isVoiceActive: boolean;
   startVoiceAgent: (designJson: any) => Promise<void>;
