@@ -2,6 +2,9 @@ import React from "react";
 import { ChatMessage as ChatMessageType } from "../../types";
 import { formatDistanceToNow } from "date-fns";
 
+// Chat Message component for displaying individual chat messages
+// Handles both user and agent message styling and formatting
+
 interface ChatMessageProps {
   message: ChatMessageType;
 }

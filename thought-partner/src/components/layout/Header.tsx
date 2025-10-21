@@ -1,6 +1,9 @@
 import React from "react";
 import { useWhiteboard } from "../../context/WhiteboardContext";
 
+// Header component for the main application header
+// Displays project information and allows editing of project name
+
 const Header: React.FC = () => {
   const { project, updateProject } = useWhiteboard();
 

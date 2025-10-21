@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 import { WhiteboardItem, ChatMessage, Project } from "../types";
 
 // Whiteboard Context for managing whiteboard state and operations
+// Central state management for all whiteboard items, chat messages, and project data
 
 interface WhiteboardContextProps {
   project: Project;

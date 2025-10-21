@@ -3,7 +3,9 @@ import { FiMic, FiMicOff, FiSend } from 'react-icons/fi';
 import { useVoiceAgent } from '../../../src/context/VoiceAgentContext';
 import { useWhiteboard } from '../../../src/context/WhiteboardContext';
 
-// Chat input component with voice and text input capabilities
+// Chat Input component with voice and text input capabilities
+// Handles message submission, voice agent toggling, and user interaction
+// Integrates with both voice and whiteboard contexts for seamless functionality
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;

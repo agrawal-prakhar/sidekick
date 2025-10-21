@@ -3,6 +3,7 @@ import Vapi from '@vapi-ai/web';
 import { WhiteboardItem } from '../types';
 
 // Voice Agent Context for managing Vapi integration and voice interactions
+// Provides voice functionality to components throughout the application
 
 interface VoiceAgentContextType {
   isVoiceActive: boolean;

@@ -15,6 +15,9 @@ import {
   FiGrid,
 } from "react-icons/fi";
 
+// Whiteboard Toolbar component for adding different types of items to the whiteboard
+// Provides a comprehensive set of tools for creating various whiteboard elements
+
 interface WhiteboardToolbarProps {
   onAddItem: (
     type:
