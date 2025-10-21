@@ -1,10 +1,12 @@
 <!doctype html>
+<!-- Vapi Agent Test Interface - Basic voice assistant testing without whiteboard integration -->
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Vapi quick test</title>
+  <title>Vapi Voice Agent Test</title>
 </head>
 <body>
+  <h1>Voice Agent Test Interface</h1>
   <button id="start-btn">▶️  Start Design Assistant</button>
   <button id="hangup-btn" disabled>⏹️  Hang up</button>
 
@@ -15,7 +17,7 @@
 
     const vapi = new Vapi(PUBLIC_WEB_KEY);
     vapi.on("*", (evt) => {
-  // You’ll see things like { type: "state-change", state: "connecting" }
+  // You'll see things like { type: "state-change", state: "connecting" }
   console.log("[Vapi]", evt);
 });
     let currentCall = null;
@@ -34,7 +36,7 @@ You are a voice-based AI assistant for technical Product Managers.
           messages: [{ role: "system", content: systemPrompt }],
         },
         voice: { provider: "playht", voiceId: "jennifer" },
-        // No tools section for now – so the LLM won't try to call functions
+        // No tools section for now – so the LLM won't try to call functions
       };
 
       currentCall = await vapi.startCall(assistantConfig);

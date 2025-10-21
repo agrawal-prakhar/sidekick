@@ -1,4 +1,8 @@
 {
+  "name": "thought-partner-root",
+  "version": "1.0.0",
+  "description": "Root package configuration for Thought Partner project dependencies",
+  "private": true,
   "dependencies": {
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.3",

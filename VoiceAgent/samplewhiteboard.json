@@ -1,15 +1,16 @@
 {
-    "projectName": "Checkout Flow",
-    "components": [
-      { "id": "btn‑pay", "type": "button", "text": "Pay", "x": 120, "y": 60 },
-      { "id": "txt‑amount", "type": "textbox", "placeholder": "$0.00", "x": 40, "y": 60 },
-      { "id": "icon‑card", "type": "icon", "name": "credit‑card", "x": 10, "y": 55 }
-    ],
-    "constraints": {
-      "stack": "React + Node 18",
-      "db": "Postgres",
-      "cloud": "AWS"
-    },
-    "targetQPS": 75
-  }
+  "_comment": "Sample whiteboard configuration for testing voice agent interactions",
+  "projectName": "Checkout Flow",
+  "components": [
+    { "id": "btn‑pay", "type": "button", "text": "Pay", "x": 120, "y": 60 },
+    { "id": "txt‑amount", "type": "textbox", "placeholder": "$0.00", "x": 40, "y": 60 },
+    { "id": "icon‑card", "type": "icon", "name": "credit‑card", "x": 10, "y": 55 }
+  ],
+  "constraints": {
+    "stack": "React + Node 18",
+    "db": "Postgres",
+    "cloud": "AWS"
+  },
+  "targetQPS": 75
+}
   

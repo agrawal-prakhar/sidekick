@@ -1,7 +1,8 @@
-// voiceDesignAssistant.js
+// Voice Design Assistant - Vapi integration for whiteboard interactions
+// This module handles voice-based interactions with the whiteboard system
 import Vapi from "@vapi-ai/web";
 /* ------------------------------------------------------------------ */
-/* 🔧  CONFIG – put your keys & helper functions here                 */
+/* 🔧  CONFIG – put your keys & helper functions here                 */
 /* ------------------------------------------------------------------ */
 
 const PUBLIC_WEB_API_KEY  = "129a98bb-bbcb-444c-b880-7e601d0b5dbb";          // Vapi Web key

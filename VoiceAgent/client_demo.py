@@ -1,3 +1,5 @@
+# Vapi client demonstration script
+# Shows how to initialize and use the Vapi Python SDK for voice interactions
 import os
 from dotenv import load_dotenv
 from vapi_ai import Vapi

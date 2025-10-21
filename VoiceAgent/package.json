@@ -1,14 +1,16 @@
 {
   "name": "voiceagent",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Voice Agent integration package for Thought Partner whiteboard application",
+  "main": "agent.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node agent.js",
+    "dev": "node agent.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["voice", "ai", "vapi", "whiteboard", "integration"],
+  "author": "Thought Partner Team",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "@vapi-ai/web": "^2.2.7"
   }

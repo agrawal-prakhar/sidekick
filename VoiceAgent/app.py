@@ -1,3 +1,5 @@
+# FastAPI backend server for Voice Agent integration
+# Handles API endpoints for whiteboard operations and voice interactions
 from fastapi import FastAPI, HTTPException
 from dotenv import load_dotenv
 import os
@@ -5,7 +7,8 @@ import os
 # Load environment variables
 load_dotenv()
 
-app = FastAPI(title="Voice Agent API")
+# Initialize FastAPI application
+app = FastAPI(title="Voice Agent API", description="Backend API for voice-enabled whiteboard interactions")
 
 @app.get("/")
 async def root():
