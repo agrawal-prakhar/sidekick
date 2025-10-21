@@ -1,3 +1,5 @@
+// Type definitions for the Thought Partner application
+
 // Whiteboard component types
 export type WhiteboardItem = {
   id: string;

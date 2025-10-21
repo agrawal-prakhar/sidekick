@@ -9,6 +9,8 @@ import React, {
 import { v4 as uuidv4 } from "uuid";
 import { WhiteboardItem, ChatMessage, Project } from "../types";
 
+// Whiteboard Context for managing whiteboard state and operations
+
 interface WhiteboardContextProps {
   project: Project;
   whiteboardItems: WhiteboardItem[];

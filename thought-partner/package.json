@@ -2,6 +2,8 @@
   "name": "thought-partner",
   "version": "0.1.0",
   "private": true,
+  "description": "AI-powered thought partner for product managers with whiteboard and voice integration",
+  "keywords": ["react", "typescript", "ai", "whiteboard", "voice", "product-management"],
   "dependencies": {
     "@headlessui/react": "^2.2.2",
     "@testing-library/dom": "^10.4.0",

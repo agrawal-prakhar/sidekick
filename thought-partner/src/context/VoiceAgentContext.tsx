@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 import Vapi from '@vapi-ai/web';
 import { WhiteboardItem } from '../types';
 
+// Voice Agent Context for managing Vapi integration and voice interactions
+
 interface VoiceAgentContextType {
   isVoiceActive: boolean;
   startVoiceAgent: (whiteboardItems: WhiteboardItem[]) => Promise<void>;

@@ -9,6 +9,8 @@ import {
 } from "../../services/WhiteboardService";
 import { FiMinimize2, FiMaximize2 } from "react-icons/fi";
 
+// Chat panel component with loading states and whiteboard integration
+
 const ChatPanel: React.FC = () => {
   const { chatMessages, addMessage, addItem, whiteboardItems, project } =
     useWhiteboard();

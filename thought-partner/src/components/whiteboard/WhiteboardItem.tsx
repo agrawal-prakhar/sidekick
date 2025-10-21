@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { FiX, FiEdit2, FiMove, FiCornerRightDown } from "react-icons/fi";
 import { Resizable } from "re-resizable";
 
+// Individual whiteboard item component with editing capabilities
+
 interface WhiteboardItemProps {
   item: WhiteboardItemType;
   maxWidth?: number;

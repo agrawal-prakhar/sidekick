@@ -5,6 +5,8 @@ import { useWhiteboard } from "../../context/WhiteboardContext";
 import { WhiteboardItem as WhiteboardItemType } from "../../types";
 import { FiTrash2, FiZoomIn, FiZoomOut, FiMaximize } from "react-icons/fi";
 
+// Main Whiteboard component with zoom controls and item management
+
 const DEFAULT_CONTENT: Record<WhiteboardItemType["type"], string> = {
   sticky: "Add your notes here...",
   text: "Add text content here...",

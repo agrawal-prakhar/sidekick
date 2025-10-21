@@ -3,6 +3,8 @@ import { FiMic, FiMicOff, FiSend } from 'react-icons/fi';
 import { useVoiceAgent } from '../../../src/context/VoiceAgentContext';
 import { useWhiteboard } from '../../../src/context/WhiteboardContext';
 
+// Chat input component with voice and text input capabilities
+
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
   isLoading?: boolean;

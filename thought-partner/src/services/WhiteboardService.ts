@@ -1,5 +1,7 @@
 import { WhiteboardItem } from "../types";
 
+// Whiteboard Service for parsing AI responses and calculating item positions
+
 // Default dimensions for whiteboard items created from AI responses
 const DEFAULT_DIMENSIONS: Record<
   WhiteboardItem["type"],

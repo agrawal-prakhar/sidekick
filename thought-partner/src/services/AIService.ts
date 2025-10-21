@@ -1,6 +1,8 @@
 import OpenAI from "openai";
 import { ChatMessage } from "../types";
 
+// AI Service for handling OpenAI API calls and generating agent responses
+
 // Check if OpenAI API key is available
 const hasApiKey =
   process.env.REACT_APP_OPENAI_API_KEY &&
