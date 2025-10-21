@@ -12,7 +12,7 @@ const Header: React.FC = () => {
     <header className="bg-white border-b border-gray-200 py-3 px-4 flex items-center justify-between">
       <div className="flex items-center">
         <div className="text-2xl font-bold text-primary mr-4">
-          ThoughtPartner
+          SideKick
         </div>
         <input
           type="text"

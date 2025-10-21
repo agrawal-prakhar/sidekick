@@ -1,6 +1,6 @@
-# ThoughtPartner
+# SideKick
 
-ThoughtPartner is a collaborative workspace for Product Managers, inspired by AI-driven development platforms. It provides an interactive whiteboard with AI agent assistance to help PMs design projects, structure thoughts, and collaborate more effectively.
+SideKick is a collaborative workspace for Product Managers, inspired by AI-driven development platforms. It provides an interactive whiteboard with AI agent assistance to help PMs design projects, structure thoughts, and collaborate more effectively.
 
 ## Features
 

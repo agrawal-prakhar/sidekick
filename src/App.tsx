@@ -17,7 +17,7 @@ const WelcomeMessages: React.FC = () => {
       addMessage({
         role: "agent",
         content:
-          "Welcome to ThoughtPartner! I'm your PM assistant. To get started, try adding items to the whiteboard using the toolbar on the left, or ask me a question about product management. You can also use voice input by clicking the microphone icon in the chat input.",
+          "Welcome to SideKick! I'm your PM assistant. To get started, try adding items to the whiteboard using the toolbar on the left, or ask me a question about product management. You can also use voice input by clicking the microphone icon in the chat input.",
         relatedItems: [],
       });
 

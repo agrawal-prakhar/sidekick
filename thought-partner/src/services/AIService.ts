@@ -127,6 +127,11 @@ export const generateAgentResponse = async (
         - [create table]Header 1,Header 2,Header 3\nRow 1 Cell 1,Row 1 Cell 2,Row 1 Cell 3\nRow 2 Cell 1,Row 2 Cell 2,Row 2 Cell 3[/create table]
         
         Use these commands to help organize information visually on the whiteboard.
+        Always create multiple components to represent different aspects of the information.
+        For project planning, include at least one table with tasks, assignments, and timelines.
+        For technical discussions, include code snippets and architecture diagrams.
+        For user stories, include acceptance criteria and user flows.
+        
         Context about the current project: ${projectContext}`,
       });
     } else {
@@ -143,13 +148,17 @@ export const generateAgentResponse = async (
         - [create text]longer text content[/create text]
         - [create table]Header 1,Header 2,Header 3\nRow 1 Cell 1,Row 1 Cell 2,Row 1 Cell 3\nRow 2 Cell 1,Row 2 Cell 2,Row 2 Cell 3[/create table]
         
-        Use these commands to help organize information visually on the whiteboard.`,
+        Use these commands to help organize information visually on the whiteboard.
+        Always create multiple components to represent different aspects of the information.
+        For project planning, include at least one table with tasks, assignments, and timelines.
+        For technical discussions, include code snippets and architecture diagrams.
+        For user stories, include acceptance criteria and user flows.`,
       });
     }
 
     // Call OpenAI API
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",
       messages: formattedMessages,
       temperature: 0.7,
       max_tokens: 500,

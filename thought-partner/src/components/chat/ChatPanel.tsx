@@ -136,7 +136,7 @@ const ChatPanel: React.FC = () => {
           <div className="flex-1 overflow-y-auto p-4">
             {chatMessages.length === 0 ? (
               <div className="text-center text-gray-500 mt-8">
-                <p className="mb-2">Welcome to ThoughtPartner!</p>
+                <p className="mb-2">Welcome to SideKick!</p>
                 <p>Ask the Master Agent anything about your project.</p>
               </div>
             ) : (
